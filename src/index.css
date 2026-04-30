@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* Expose semantic tokens as Tailwind utilities (bg-surface, text-ink, etc.)
+   `inline` prevents Tailwind from emitting its own CSS vars — our tokens.css
+   owns the variables; Tailwind just references them in utility classes. */
+@theme inline {
+  --color-primary:      var(--color-primary);
+  --color-surface:      var(--color-surface);
+  --color-ink:          var(--color-ink);
+  --color-ink-muted:    var(--color-ink-muted);
+  --color-accent:       var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-line:         var(--color-line);
+  --color-danger:       var(--color-danger);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  font-family: system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

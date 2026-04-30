@@ -1,0 +1,49 @@
+/* ─── Layer 1: Primitive tokens ──────────────────────────────── */
+:root {
+  /* Paper scale (warm whites / off-whites) */
+  --paper-50:  #fafaf9;
+  --paper-100: #f5f5f4;
+  --paper-200: #e7e5e4;
+  --paper-300: #d6d3d1;
+
+  /* Ink scale (warm grays / near-blacks) */
+  --ink-500: #78716c;
+  --ink-600: #57534e;
+  --ink-700: #44403c;
+  --ink-800: #292524;
+  --ink-900: #1c1917;
+
+  /* Rust scale (accent) */
+  --rust-400: #fb923c;
+  --rust-500: #f97316;
+  --rust-600: #ea580c;
+  --rust-700: #c2410c;
+
+  /* Danger */
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+}
+
+/* ─── Layer 2: Semantic tokens (light mode defaults) ─────────── */
+:root {
+  --color-primary:      var(--rust-500);
+  --color-surface:      var(--paper-50);
+  --color-ink:          var(--ink-900);
+  --color-ink-muted:    var(--ink-500);
+  --color-accent:       var(--rust-500);
+  --color-accent-hover: var(--rust-600);
+  --color-line:         var(--paper-200);
+  --color-danger:       var(--red-500);
+}
+
+/* ─── Layer 3: Dark mode overrides ───────────────────────────── */
+:root[data-theme="dark"] {
+  --color-primary:      var(--rust-500);
+  --color-surface:      var(--ink-900);
+  --color-ink:          var(--paper-50);
+  --color-ink-muted:    var(--ink-500);
+  --color-accent:       var(--rust-400);
+  --color-accent-hover: var(--rust-500);
+  --color-line:         var(--ink-800);
+  --color-danger:       var(--red-500);
+}
