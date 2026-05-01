@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "figma-code-connect-components": {
+      "source": "openai/skills",
+      "sourceType": "github",
+      "skillPath": "skills/.curated/figma-code-connect-components/SKILL.md",
+      "computedHash": "755e8bd95ab4154de4ebd871752520c4f172a009b1062bef8bb0a0beb85e333c"
+    },
+    "figma-use": {
+      "source": "figma/mcp-server-guide",
+      "sourceType": "github",
+      "skillPath": "skills/figma-use/SKILL.md",
+      "computedHash": "06ad92ee43055d7f93ad614b7c25dd4cebeee281d0a12445ccc0a0181a87fdd3"
+    }
+  }
+}

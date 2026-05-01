@@ -1,29 +1,64 @@
 @import "tailwindcss";
 
-/* Expose semantic tokens as Tailwind utilities (bg-surface, text-ink, etc.)
-   `inline` prevents Tailwind from emitting its own CSS vars — our tokens.css
-   owns the variables; Tailwind just references them in utility classes. */
+/* Expose semantic tokens as Tailwind utilities.
+   `inline` prevents Tailwind from emitting its own CSS vars — tokens.css
+   owns the variables; Tailwind just references them via utility classes. */
 @theme inline {
-  --color-primary:      var(--color-primary);
-  --color-surface:      var(--color-surface);
-  --color-ink:          var(--color-ink);
-  --color-ink-muted:    var(--color-ink-muted);
-  --color-accent:       var(--color-accent);
+  /* Color */
+  --color-primary: var(--color-primary);
+  --color-surface: var(--color-surface);
+  --color-surface-muted: var(--color-surface-muted);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-accent: var(--color-accent);
   --color-accent-hover: var(--color-accent-hover);
-  --color-line:         var(--color-line);
-  --color-danger:       var(--color-danger);
+  --color-line: var(--color-line);
+  --color-danger: var(--color-danger);
+
+  /* Radius — overrides Tailwind's default rounded-* scale */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-pill: var(--radius-pill);
+
+  /* Shadow — overrides Tailwind's default shadow-* scale */
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+
+  /* Spacing — semantic aliases exposed as p-xs, gap-md, etc. */
+  --spacing-xs: var(--spacing-xs);
+  --spacing-sm: var(--spacing-sm);
+  --spacing-md: var(--spacing-md);
+  --spacing-lg: var(--spacing-lg);
+  --spacing-xl: var(--spacing-xl);
+  --spacing-2xl: var(--spacing-2xl);
+
+  /* Typography */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  --text-xs: var(--text-xs);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-2xl: var(--text-2xl);
+  --text-3xl: var(--text-3xl);
+  --text-4xl: var(--text-4xl);
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 body {
   background-color: var(--color-surface);
   color: var(--color-ink);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
