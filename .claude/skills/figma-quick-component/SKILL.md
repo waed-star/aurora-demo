@@ -190,6 +190,18 @@ Create the component directory at `src/components/ui/ComponentName/` and write a
 - If the component manages state (open/closed, selected value): support both controlled (`value` + `onChange`) and uncontrolled (`defaultValue`).
 - For interactive components with focus/keyboard/ARIA: use **Radix UI primitives** — do not re-implement what Radix handles.
 
+### Accessibility Requirements (WCAG 2.1 AA — Non-Negotiable)
+
+These apply to every component without exception. A component that skips any of these does not pass the quality gate.
+
+- **ARIA roles/states/properties**: Every interactive element must carry the correct ARIA role (or use the native element whose implicit role is correct) and keep `aria-disabled`, `aria-expanded`, `aria-selected`, `aria-checked`, etc. in sync with visual state.
+- **Keyboard navigation**: Tab reaches the component; Enter/Space activate it; Arrow keys navigate within composite widgets (e.g. radio groups, tabs, menus). Never trap focus outside a modal.
+- **Focus indicators**: Do not suppress the focus ring (`outline: none` / `focus:outline-none` without a replacement is forbidden). Use `focus-visible:ring-2` or equivalent so the ring appears only on keyboard focus.
+- **Labels**: Every interactive element must have an accessible name — either visible text, `aria-label`, or `aria-labelledby`. Icon-only buttons need `aria-label`.
+- **Color is not the sole signal**: Any state communicated by color (error, selected, disabled) must also be communicated via text, icon, or ARIA attribute.
+- **Radix primitives handle ARIA and keyboard automatically** for Dialog, Tabs, Select, Tooltip, Dropdown, Popover, etc. — use them; never reimplement.
+- **Native elements for simple components**: Button → `<button>`, Input → `<input>`, Checkbox → `<input type="checkbox">`. Do not use `<div>` with `role="button"` when a real `<button>` works.
+
 ---
 
 ### If Flat Pattern — follow `src/components/ui/Button/`
@@ -281,6 +293,7 @@ export const Disabled: Story = { args: { variant: "primary", disabled: true } };
 #### `ComponentName.test.tsx`
 ```tsx
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { describe, it, expect } from "vitest";
 import { ComponentName } from "./ComponentName";
@@ -305,6 +318,24 @@ describe("ComponentName", () => {
   it("renders as child element with asChild", () => {
     render(<ComponentName asChild><span>Slot</span></ComponentName>);
     expect(screen.getByText("Slot").tagName).toBe("SPAN");
+  });
+
+  // Accessibility
+  it("has the correct implicit or explicit ARIA role", () => {
+    render(<ComponentName>Content</ComponentName>);
+    // Replace "button" with the correct role for this component
+    expect(screen.getByRole("button", { name: "Content" })).toBeInTheDocument();
+  });
+
+  it("is reachable via keyboard Tab", async () => {
+    render(<ComponentName>Content</ComponentName>);
+    await userEvent.tab();
+    expect(screen.getByRole("button", { name: "Content" })).toHaveFocus();
+  });
+
+  it("reflects disabled state in aria-disabled", () => {
+    render(<ComponentName disabled>Content</ComponentName>);
+    expect(screen.getByRole("button", { name: "Content" })).toBeDisabled();
   });
 });
 ```
@@ -451,6 +482,20 @@ describe("ComponentName", () => {
     renderComponent();
     // assert roles match the Radix primitive's ARIA contract
   });
+
+  // Accessibility
+  it("is keyboard navigable with Tab and arrow keys", async () => {
+    renderComponent();
+    await userEvent.tab();
+    // assert the first interactive element receives focus
+    // then arrow-key through and assert focus moves correctly
+  });
+
+  it("does not suppress the focus ring", () => {
+    renderComponent();
+    // assert no element has outline:none without a replacement focus indicator
+    // Spot-check: the focused element should have a visible ring class
+  });
 });
 ```
 
@@ -508,11 +553,30 @@ Compare the screenshot against the Figma design:
 
 If anything looks wrong, fix it in the source files, wait for Storybook HMR to reload (~2 sec), then take a second screenshot to confirm.
 
-### 4e. Report to the user
+### 4e. Verify accessibility in the Storybook preview
+
+After the visual check passes, run a keyboard accessibility walkthrough in the preview:
+
+1. Call `mcp__Claude_Preview__preview_eval` to tab into the component and confirm focus lands on the correct element:
+   ```js
+   document.querySelector('[data-story]')?.focus();
+   document.activeElement?.tagName;
+   ```
+2. Check for missing ARIA labels on interactive elements:
+   ```js
+   [...document.querySelectorAll('button, input, select, [role]')]
+     .filter(el => !el.getAttribute('aria-label') && !el.getAttribute('aria-labelledby') && !el.textContent?.trim())
+     .map(el => el.outerHTML.slice(0, 120));
+   ```
+3. Confirm no `outline: none` without a replacement ring — check computed styles on the focused element.
+4. If any issue is found (missing label, suppressed focus ring, wrong role), fix the component source and re-screenshot.
+
+### 4f. Report to the user
 
 - All 5 files created in `src/components/ui/ComponentName/`
 - `npm run type-check` passes
 - Embed the Storybook screenshot
+- Accessibility check result (pass or issues found + fixed)
 - Note any visual discrepancies found and whether they were fixed
 
 ---
@@ -522,8 +586,7 @@ If anything looks wrong, fix it in the source files, wait for Storybook HMR to r
 - `research.md`, `quickstart.md`, `contracts/` — not generated
 - `plan.md` — Spec Kit plan runs but only `data-model.md` is extracted from it
 - `tasks.md` — skipped entirely; the skill proceeds straight to implementation
-- Full unit test coverage (> 80%) — 3-5 smoke tests only
-- A11y test file — accessibility handled in implementation via Radix and ARIA
+- Full unit test coverage (> 80%) — smoke tests + targeted a11y tests only (role, keyboard, disabled state)
 - Bundle size analysis
 - Spec Kit review gates (`review-spec`, `review-plan`) — no gates; proceed after each step
 - `speckit.tasks` and `speckit.implement` commands — replaced by Step 3 of this skill
