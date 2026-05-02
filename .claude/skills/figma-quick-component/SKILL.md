@@ -7,7 +7,23 @@ description: Implement a single Figma component in React. Uses Spec Kit to gener
 
 Implement a React component from a Figma design.
 
-**Prerequisite**: You MUST invoke the `figma-use` skill before calling `use_figma`. Load it now before proceeding.
+**Prerequisites** — complete both before any other step:
+
+1. **Node v23** — verify the active version and switch if needed:
+   ```bash
+   node --version
+   ```
+   If the output does not start with `v23`, run:
+   ```bash
+   nvm use 23
+   ```
+   If nvm reports that v23 is not installed:
+   ```bash
+   nvm install 23 && nvm use 23
+   ```
+   Confirm with `node --version` before proceeding. Do not continue on an older Node version.
+
+2. **figma-use skill** — you MUST invoke the `figma-use` skill before calling `use_figma`. Load it now before proceeding.
 
 ---
 
@@ -147,6 +163,15 @@ Read `.github/agents/speckit.plan.agent.md` and execute it scoped to data modell
 Skip writing a full `plan.md` — only the data-model section is needed here.
 
 **Stop after Step 2b.** Do not run `speckit.tasks` or `speckit.implement` — the rest of the workflow is handled below.
+
+### 2c. Read `data-model.md` before writing any code
+
+**Mandatory.** Read `specs/{branch}/data-model.md` in full before starting Step 3. This file is the source of truth for:
+- The exact TypeScript props interface (name, types, optional/required, defaults)
+- The CVA variant keys and their string values
+- Any state interfaces the component needs
+
+The implementation in Step 3 **must match `data-model.md` exactly** — do not invent props, rename variants, or add fields not present there. If the data-model is ambiguous or missing a field you need, resolve it by updating the file before writing code.
 
 ---
 
@@ -431,16 +456,64 @@ describe("ComponentName", () => {
 
 ---
 
-## Step 4 — Type-Check and Confirm (1 min)
+## Step 4 — Type-Check, Open Storybook in VS Code, and Visually Verify (2-3 min)
+
+### 4a. Type-check
 
 ```bash
 npm run type-check
 ```
 
-Fix any TypeScript errors inline. Then confirm to the user:
+Fix any TypeScript errors inline before proceeding.
+
+### 4b. Start Storybook
+
+Check whether Storybook is already running:
+
+```bash
+lsof -ti :6006
+```
+
+If no process is listening on port 6006, start it in the background:
+
+```bash
+npm run storybook &
+```
+
+Poll until the server responds (retry up to 6 times at 5-second intervals):
+
+```bash
+for i in $(seq 1 6); do
+  curl -s -o /dev/null -w "%{http_code}" http://localhost:6006 | grep -q "200" && break
+  sleep 5
+done
+```
+
+### 4c. Open the component story in VS Code's built-in preview
+
+Use the `mcp__Claude_Preview__preview_start` tool to open Storybook inside VS Code:
+
+- URL: `http://localhost:6006/?path=/story/ui-componentname--primary`
+  - Replace `componentname` with the lowercase, hyphenated component name (e.g. `search-input` for `SearchInput`).
+  - Replace `primary` with the first exported story name lowercased and hyphenated.
+
+After the preview loads, call `mcp__Claude_Preview__preview_screenshot` to capture the rendered story.
+
+### 4d. Verify visually
+
+Compare the screenshot against the Figma design:
+- Correct variant styles (color, spacing, radius, typography match the design tokens)?
+- All exported stories render without errors?
+- No console errors? (call `mcp__Claude_Preview__preview_console_logs` to check)
+
+If anything looks wrong, fix it in the source files, wait for Storybook HMR to reload (~2 sec), then take a second screenshot to confirm.
+
+### 4e. Report to the user
+
 - All 5 files created in `src/components/ui/ComponentName/`
 - `npm run type-check` passes
-- Run `npm run storybook` to visually verify against the Figma design
+- Embed the Storybook screenshot
+- Note any visual discrepancies found and whether they were fixed
 
 ---
 
