@@ -143,35 +143,51 @@ Do all three in a single parallel batch:
 
 ## Step 2 — Generate Spec + Data-Model via Spec Kit
 
-Use Spec Kit's `specify` and `plan` agent prompts to generate the planning documents. Read each agent file and follow its instructions, scoped to this component only. Output goes to `specs/{branch-name}/`.
+**These steps are mandatory. Do not skip them, summarise them in memory, or defer them to later. The files must exist on disk before Step 3 begins.**
 
-### 2a. Generate `spec.md` — follow `.github/agents/speckit.specify.agent.md`
+### 2a. Resolve the feature directory
 
-Read `.github/agents/speckit.specify.agent.md` and execute it with the component description derived from the Figma node. The input `$ARGUMENTS` should be a concise description of the component, e.g.:
+Get the current branch name and derive the spec directory:
+
+```bash
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+SPEC_DIR="specs/$BRANCH"
+mkdir -p "$SPEC_DIR"
+echo "$SPEC_DIR"
+```
+
+All spec files in this step go into that directory.
+
+### 2b. Write `spec.md`
+
+Read `.github/agents/speckit.specify.agent.md` in full, then execute it with the following `$ARGUMENTS` (fill in from the Figma node data gathered in Step 1):
 
 > "Implement the [ComponentName] component from Figma. It has [N] variants: [list]. Used for [purpose]."
 
-This will produce `specs/{branch}/spec.md` using the spec template. **Scope the spec to the component only** — ignore any sections about backend, APIs, or multi-page flows that don't apply.
+The agent instructions tell you to copy `.specify/templates/spec-template.md` as the starting point. Do that literally — copy the template to `$SPEC_DIR/spec.md`, then fill it in. **Scope the spec to this component only** — skip any sections about backend, APIs, or multi-page flows that don't apply.
 
-### 2b. Generate `data-model.md` — follow `.github/agents/speckit.plan.agent.md`
+**Hard gate — do not proceed until this passes:**
+```bash
+test -f "$SPEC_DIR/spec.md" && echo "OK" || echo "MISSING — write spec.md before continuing"
+```
 
-Read `.github/agents/speckit.plan.agent.md` and execute it scoped to data modelling only. From the plan output, extract or write `specs/{branch}/data-model.md` containing:
-- The TypeScript props interface
-- The CVA variant shape
-- State interfaces (only if the component is stateful)
+### 2c. Write `data-model.md`
 
-Skip writing a full `plan.md` — only the data-model section is needed here.
+Read `.github/agents/speckit.plan.agent.md` in full. Execute only Phase 1 (Design & Contracts → data-model step). **Write** `$SPEC_DIR/data-model.md` to disk containing:
+- The exact TypeScript props interface (every prop: name, type, optional/required, default)
+- The CVA variant shape (every key and every string value)
+- State interfaces if the component is stateful
 
-**Stop after Step 2b.** Do not run `speckit.tasks` or `speckit.implement` — the rest of the workflow is handled below.
+Do not hold this in memory. Do not skip writing the file. Do not write `plan.md` or run Phase 0 (research).
 
-### 2c. Read `data-model.md` before writing any code
+**Hard gate — do not proceed until this passes:**
+```bash
+test -f "$SPEC_DIR/data-model.md" && echo "OK" || echo "MISSING — write data-model.md before continuing"
+```
 
-**Mandatory.** Read `specs/{branch}/data-model.md` in full before starting Step 3. This file is the source of truth for:
-- The exact TypeScript props interface (name, types, optional/required, defaults)
-- The CVA variant keys and their string values
-- Any state interfaces the component needs
+### 2d. Read `data-model.md` before writing any code
 
-The implementation in Step 3 **must match `data-model.md` exactly** — do not invent props, rename variants, or add fields not present there. If the data-model is ambiguous or missing a field you need, resolve it by updating the file before writing code.
+Read `$SPEC_DIR/data-model.md` in full. The implementation in Step 3 must match it exactly — do not invent props, rename variants, or add fields not present. If anything is ambiguous, update the file first, then proceed.
 
 ---
 
