@@ -1,6 +1,6 @@
 ---
 name: figma-quick-component
-description: Implement a single Figma component in React. Uses Spec Kit to generate spec.md and data-model.md, then implements all 5 constitution-required files in parallel — no full Spec Kit pipeline, no review gates, no tasks file. Use when the user provides a Figma node URL and wants a component built fast.
+description: Implement a single Figma component in React. Runs Spec Kit to generate spec.md, checklists/requirements.md, plan.md, and data-model.md — implementation is BLOCKED until all four files are verified on disk. Use when the user provides a Figma node URL and wants a component built correctly.
 ---
 
 # Figma Quick Component
@@ -125,28 +125,66 @@ Do all three in a single parallel batch:
 
 ---
 
-## Step 2 — Generate Spec + Data-Model via Spec Kit
+## Step 2 — Run Spec Kit (MANDATORY — BLOCKING)
 
-Use Spec Kit's `specify` and `plan` agent prompts to generate the planning documents. Read each agent file and follow its instructions, scoped to this component only. Output goes to `specs/{branch-name}/`.
+> **⛔ HARD STOP: You MUST complete all of 2a and 2b before writing a single line of component code.**
+> Do not rationalise skipping or abbreviating Spec Kit because you "have enough Figma context". These files are the ground truth that prevents implementation drift. The component cannot be started without them.
 
-### 2a. Generate `spec.md` — follow `.github/agents/speckit.specify.agent.md`
+Use the component name and variant information from Step 1 as the description input. Format it as:
 
-Read `.github/agents/speckit.specify.agent.md` and execute it with the component description derived from the Figma node. The input `$ARGUMENTS` should be a concise description of the component, e.g.:
+> "Implement the [ComponentName] component from Figma. It has [N] variants: [list]. Used for [purpose derived from Figma]."
 
-> "Implement the [ComponentName] component from Figma. It has [N] variants: [list]. Used for [purpose]."
+---
 
-This will produce `specs/{branch}/spec.md` using the spec template. **Scope the spec to the component only** — ignore any sections about backend, APIs, or multi-page flows that don't apply.
+### 2a — Run `speckit.specify` → produces `spec.md` and `checklists/requirements.md`
 
-### 2b. Generate `data-model.md` — follow `.github/agents/speckit.plan.agent.md`
+1. Read `.github/agents/speckit.specify.agent.md` in full.
+2. Execute **every instruction in that file** with the component description above as `$ARGUMENTS`.
+   - This will create `specs/NNN-component-name/` and write `spec.md` inside it.
+   - It will then validate the spec and write `specs/NNN-component-name/checklists/requirements.md`.
+   - It will write `.specify/feature.json` recording the feature directory path.
+3. Scope the spec to the UI component only — skip any sections about backend, APIs, or multi-page flows.
 
-Read `.github/agents/speckit.plan.agent.md` and execute it scoped to data modelling only. From the plan output, extract or write `specs/{branch}/data-model.md` containing:
-- The TypeScript props interface
-- The CVA variant shape
-- State interfaces (only if the component is stateful)
+**After 2a completes — verify with the Read tool before continuing:**
 
-Skip writing a full `plan.md` — only the data-model section is needed here.
+- Read `specs/NNN-component-name/spec.md` → must exist and contain User Scenarios + Functional Requirements sections.
+- Read `specs/NNN-component-name/checklists/requirements.md` → must exist and contain the quality checklist.
 
-**Stop after Step 2b.** Do not run `speckit.tasks` or `speckit.implement` — the rest of the workflow is handled below.
+**If either file is missing or empty → re-run speckit.specify before proceeding.**
+
+---
+
+### 2b — Run `speckit.plan` → produces `plan.md` and `data-model.md`
+
+1. Read `.github/agents/speckit.plan.agent.md` in full.
+2. Execute **every instruction in that file**. The plan agent reads `.specify/feature.json` to locate the feature directory from 2a, then runs `setup-plan.sh --json` from the repo root to get all paths.
+3. The plan agent produces:
+   - `specs/NNN-component-name/plan.md` — technical implementation plan
+   - `specs/NNN-component-name/data-model.md` — TypeScript props interface, CVA variant shape, and state interfaces
+
+**After 2b completes — verify with the Read tool before continuing:**
+
+- Read `specs/NNN-component-name/plan.md` → must exist and contain the Constitution Check and Technical Approach sections.
+- Read `specs/NNN-component-name/data-model.md` → must exist and contain the full TypeScript interface for the component's props.
+
+**If either file is missing or empty → re-run speckit.plan before proceeding.**
+
+> **Do NOT run `speckit.tasks` or `speckit.implement`** — the implementation is handled by Step 3 of this skill.
+
+---
+
+### ⛔ GATE: All four files must be verified before Step 3
+
+Use the Read tool on all four paths now. Do not proceed until every Read succeeds with substantive content:
+
+```
+Read: specs/NNN-component-name/spec.md
+Read: specs/NNN-component-name/checklists/requirements.md
+Read: specs/NNN-component-name/plan.md
+Read: specs/NNN-component-name/data-model.md
+```
+
+**Any missing or empty file = STOP. Fix it before continuing.**
 
 ---
 
@@ -154,10 +192,12 @@ Skip writing a full `plan.md` — only the data-model section is needed here.
 
 Create the component directory at `src/components/ui/ComponentName/` and write all 5 files **in a single parallel batch**. Do not write them sequentially.
 
+> Before writing, re-read `specs/NNN-component-name/data-model.md`. The TypeScript interfaces in that file are your authoritative source — implement them verbatim in `ComponentName.types.ts`. Do not invent props that aren't in the data model.
+
 ### Constitution Requirements (Non-Negotiable)
 - **Semantic tokens only**: `bg-accent`, `text-ink`, `border-border`, etc. No hex values, no `bg-[#fff]`, no inline `style` for design properties.
 - **`forwardRef`** on every component.
-- **`cn()`** from `../../../lib/utils` for class merging. Consumer `className` always wins.
+- **`cn()`** from `@/lib/utils` for class merging. Consumer `className` always wins.
 - **`displayName`** set explicitly: `ComponentName.displayName = "ComponentName"`.
 - **`asChild`** via Radix `Slot` on components wrapping a single interactive element.
 - **`cva`** from `class-variance-authority` for variants.
@@ -326,10 +366,7 @@ const ComponentNamePart = forwardRef<HTMLElement, ComponentNamePartProps>(
   ({ className, ...props }, ref) => (
     <RadixPrimitive.Part
       ref={ref}
-      className={cn(
-        "/* part classes — semantic tokens only */",
-        className,
-      )}
+      className={cn("/* part classes — semantic tokens only */", className)}
       {...props}
     />
   ),
@@ -431,24 +468,63 @@ describe("ComponentName", () => {
 
 ---
 
-## Step 4 — Type-Check and Confirm (1 min)
+## Step 4 — Type-Check, Launch Storybook, and Verify (2-3 min)
+
+### 4a — Type-check
 
 ```bash
 npm run type-check
 ```
 
-Fix any TypeScript errors inline. Then confirm to the user:
-- All 5 files created in `src/components/ui/ComponentName/`
+Fix any TypeScript errors inline before continuing.
+
+### 4b — Start Storybook in the background (no system browser)
+
+```bash
+npm run storybook -- --no-open
+```
+
+The `--no-open` flag prevents Storybook from launching the system browser. Run this in the background. Storybook starts on `http://localhost:6006` by default.
+
+### 4c — Open in VS Code Simple Browser only
+
+Open the component's story directly in the VS Code built-in browser using this URL format:
+
+```
+http://localhost:6006/?path=/story/ui-componentname--default
+```
+
+Use the VS Code Simple Browser panel — do NOT open in the system browser or a new Chrome tab. The correct story path slug follows Storybook's convention: `ui-[componentname]--[storyname]` (all lowercase, spaces replaced with hyphens). For example:
+- `title: "UI/SearchSection"` with story `Default` → `ui-searchsection--default`
+- `title: "UI/Button"` with story `Primary` → `ui-button--primary`
+
+### 4d — Verify every story against the Figma design
+
+For each exported story in `ComponentName.stories.tsx`, navigate to it in the Simple Browser and take a screenshot. Verify:
+
+- [ ] Component renders without errors or blank output
+- [ ] All Figma variants are represented (one story per variant)
+- [ ] Spacing, colours, and radius use semantic tokens (no raw values visible in inspector)
+- [ ] Hover and focus states are visible
+- [ ] Disabled state (if applicable) renders correctly
+- [ ] Component does not overflow its container
+
+If any story shows a blank render, console error, or visual mismatch → fix the component and re-verify before reporting complete.
+
+### 4e — Report completion
+
+Confirm to the user:
+
+- All 4 spec files exist in `specs/NNN-component-name/`
+- All 5 component files created in `src/components/ui/ComponentName/`
 - `npm run type-check` passes
-- Run `npm run storybook` to visually verify against the Figma design
+- Each story verified visually in VS Code Simple Browser (list any issues found and fixed)
 
 ---
 
 ## What This Skill Skips (Intentionally)
 
 - `research.md`, `quickstart.md`, `contracts/` — not generated
-- `plan.md` — Spec Kit plan runs but only `data-model.md` is extracted from it
-- `tasks.md` — skipped entirely; the skill proceeds straight to implementation
 - Full unit test coverage (> 80%) — 3-5 smoke tests only
 - A11y test file — accessibility handled in implementation via Radix and ARIA
 - Bundle size analysis
