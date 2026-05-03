@@ -5,7 +5,7 @@
 **Status**: Draft  
 **Input**: User description: "Generate specification for the NavBar component from Figma. The component is a navigation bar with 3 variants/selected states: Home, Search, and Profile. It displays navigation items with icons and labels, with one item in a selected/active state at a time. The component accepts a `selected` prop to control which navigation item appears active. Used for primary navigation in applications with a bottom navigation bar."
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Navigate to Home Section (Priority: P1)
 
@@ -90,7 +90,7 @@ Users need clear visual feedback about which section they are currently in. The 
 - What is the behavior when the component mounts—does it require an initial `selected` prop value?
 - How does the NavBar respond to rapid successive clicks on different items?
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -112,7 +112,7 @@ Users need clear visual feedback about which section they are currently in. The 
 - **Selected State**: A string value representing which navigation item is currently active ("home", "search", or "profile")
 - **Nav Item Click Event**: Event triggered when user interacts with a navigation item, containing the item identifier/section
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

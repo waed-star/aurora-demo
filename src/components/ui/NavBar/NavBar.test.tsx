@@ -18,9 +18,7 @@ describe("NavBar", () => {
   it("renders all three navigation items", () => {
     render(<NavBar {...defaultProps} />);
     expect(screen.getByRole("button", { name: /Home/i })).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /Search/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Search/i })).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /Profile/i }),
     ).toBeInTheDocument();
@@ -64,10 +62,7 @@ describe("NavBar", () => {
 
   it("supports custom item labels", () => {
     render(
-      <NavBar
-        {...defaultProps}
-        itemLabels={["Inicio", "Buscar", "Perfil"]}
-      />,
+      <NavBar {...defaultProps} itemLabels={["Inicio", "Buscar", "Perfil"]} />,
     );
     expect(screen.getByRole("button", { name: /Inicio/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Buscar/i })).toBeInTheDocument();

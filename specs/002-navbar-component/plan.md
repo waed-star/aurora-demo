@@ -84,6 +84,7 @@ src/
 ## Complexity Tracking
 
 No Constitution violations anticipated. All patterns comply with Aurora design system rules:
+
 - Semantic tokens only (Layer 2)
 - forwardRef + displayName + className
 - Flat pattern (no sub-components)

@@ -75,7 +75,7 @@ type NavItemId = "home" | "search" | "profile";
 
 ### Root Component Props: `NavBarProps`
 
-```typescript
+````typescript
 /**
  * Props for the NavBar component.
  *
@@ -181,7 +181,7 @@ interface NavBarProps extends React.ComponentPropsWithoutRef<"nav"> {
    */
   className?: string;
 }
-```
+````
 
 ### Navigation Item Click Event: `NavSelectEvent`
 
@@ -227,7 +227,7 @@ const navBarVariants = cva(
     defaultVariants: {
       // Reserved for future defaults
     },
-  }
+  },
 );
 ```
 
@@ -331,16 +331,16 @@ interface NavBarContextValue {
 
 The component consumes the following semantic tokens (Layer 2):
 
-| Token | Usage | Example Value (Light) |
-|-------|-------|----------------------|
-| `--color-surface` | NavBar background | `#ffffff` |
-| `--color-surface-border` | Top border color | `#e5e7eb` |
-| `--color-text-secondary` | Inactive item text | `#6b7280` |
-| `--color-text-accent` | Active item text | `#0066ff` |
-| `--color-bg-accent-subtle` | Active item background (optional) | `#f0f7ff` |
-| `--spacing-sm` | Gap between items (if any) | `0.5rem` (4px) |
-| `--spacing-md` | Padding inside item | `0.75rem` (12px) |
-| `--radius-sm` | Border radius for item background | `0.375rem` (6px) |
+| Token                      | Usage                             | Example Value (Light) |
+| -------------------------- | --------------------------------- | --------------------- |
+| `--color-surface`          | NavBar background                 | `#ffffff`             |
+| `--color-surface-border`   | Top border color                  | `#e5e7eb`             |
+| `--color-text-secondary`   | Inactive item text                | `#6b7280`             |
+| `--color-text-accent`      | Active item text                  | `#0066ff`             |
+| `--color-bg-accent-subtle` | Active item background (optional) | `#f0f7ff`             |
+| `--spacing-sm`             | Gap between items (if any)        | `0.5rem` (4px)        |
+| `--spacing-md`             | Padding inside item               | `0.75rem` (12px)      |
+| `--radius-sm`              | Border radius for item background | `0.375rem` (6px)      |
 
 If any of these tokens are missing from `src/styles/tokens.css`, implementation will be blocked until tokens are added per Aurora conventions.
 
@@ -351,7 +351,7 @@ If any of these tokens are missing from `src/styles/tokens.css`, implementation 
 ### ARIA Attributes
 
 - **NavBar root**: `role="navigation"`, `aria-label="Main navigation"` (customizable via `ariaLabel` prop)
-- **Each item button**: 
+- **Each item button**:
   - `role="button"` (or `tabindex="0"` if using plain divs)
   - `aria-label="{item label}"` (e.g., "Go to Home section")
   - `aria-current="page"` (on active item only)
