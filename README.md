@@ -15,6 +15,30 @@ npm run build-storybook  # Build static Storybook site
 
 Aurora uses Claude Code's `/figma-quick-component` skill to turn a Figma frame into a production-ready component. The agent follows a spec-driven pipeline — it generates planning artifacts before writing any code, so you can review and redirect before implementation begins.
 
+### How it works
+
+The skill is designed around two principles: **rich context upfront** and **agentic verification at the end**.
+
+**1. SpecKit for high-quality specs**
+Before writing a single line of component code, the agent runs two SpecKit commands:
+- `speckit.specify` → produces `spec.md` (user scenarios, functional requirements) and `checklists/requirements.md` (completion checklist)
+- `speckit.plan` → produces `plan.md` (technical approach, token mapping) and `data-model.md` (TypeScript props interface, CVA variant shape)
+
+These four files are the contract. Implementation is hard-blocked until all four exist and have substantive content. This is context engineering in practice: the more precisely the spec defines what to build, the less back-and-forth is needed during implementation — the model has everything it needs to make the right call every time.
+
+**2. Skips `speckit.tasks` and `speckit.implement`**
+The full SpecKit pipeline has two more commands — `tasks` (breaks work into a numbered task list) and `implement` (runs through them one by one). This skill intentionally skips both. For a single UI component, generating a granular task list and then re-reading it on every step burns context unnecessarily without adding quality. The implementation goes straight from the four spec files to writing all five component files in a single parallel batch.
+
+**3. Agentic visual verification**
+Once the component is written, the agent doesn't just run a type-check and stop. It:
+1. Starts Storybook in the background
+2. Opens the component's Storybook stories in a browser
+3. Navigates through each variant story, taking a screenshot of each
+4. Checks every screenshot against the spec — spacing, colours, radius, states, overflow
+5. If anything looks wrong (blank render, visual mismatch, console error) — it fixes the component and re-verifies before reporting complete
+
+---
+
 ### How to use it
 
 1. Open this repo in [Claude Code](https://claude.ai/code) (desktop app, VS Code extension, or via the StackBlitz + Claude Code integration)
