@@ -29,7 +29,10 @@ These four files are the contract. Implementation is hard-blocked until all four
 **2. Skips `speckit.tasks` and `speckit.implement`**
 The full SpecKit pipeline has two more commands — `tasks` (breaks work into a numbered task list) and `implement` (runs through them one by one). This skill intentionally skips both. For a single UI component, generating a granular task list and then re-reading it on every step burns context unnecessarily without adding quality. The implementation goes straight from the four spec files to writing all five component files in a single parallel batch.
 
-**3. Agentic visual verification**
+**3. Designed for teams, not just individuals**
+The skill is a slash command (`/figma-quick-component`) — engineers invoke it with one word, no prompt-writing required. This keeps results consistent across every engineer and every team using the design system: the same spec structure, the same implementation rules, the same verification steps, every time. When the process needs to change (new token, new Radix primitive, updated constitution rule), you update the skill file once and every future run picks it up.
+
+**4. Agentic visual verification**
 Once the component is written, the agent doesn't just run a type-check and stop. It:
 1. Starts Storybook in the background
 2. Opens the component's Storybook stories in a browser
@@ -65,6 +68,11 @@ See the `specs/` folder for completed examples:
 - [`specs/002-navbar-component/`](specs/002-navbar-component/) — Navigation bar component
 
 Each folder contains the full set of planning artifacts produced by the agent before implementation.
+
+**Demo recordings**
+
+- [Search section component](https://1drv.ms/v/c/cc39a0b7dbfc17ac/IQAduYUd8pXuRaKRiCNl_jxHAaoTMy5uxFm5SMWxqGsjFOg?e=kQmZIj) — Full run from Figma URL to verified component. From **5:29**, watch the agent take control of Storybook, switch between variants, take screenshots, and self-correct until every story passes.
+- [Navbar component](https://1drv.ms/v/c/cc39a0b7dbfc17ac/IQBHxGEhTZoRSLHCd8oUCv0LAamFk4kySg4zxpEqBZWyyKs?e=JlGSHp) — Another end-to-end example showing the same pipeline on a more complex component.
 
 ## Project structure
 
