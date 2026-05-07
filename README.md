@@ -1,4 +1,4 @@
-# Aurora Design System
+# Aurora Design System Demo
 
 A React 19 + TypeScript component library built with design tokens, Tailwind CSS v4, and Radix UI primitives. Components are developed and documented in Storybook.
 
@@ -13,7 +13,7 @@ npm run build-storybook  # Build static Storybook site
 
 ## Building a component from a Figma design
 
-Aurora uses Claude Code's `/figma-quick-component` skill to turn a Figma frame into a production-ready component. The agent follows a spec-driven pipeline — it generates planning artifacts before writing any code, so you can review and redirect before implementation begins.
+This design system uses Claude Code's `/figma-quick-component` skill to turn a Figma frame into a production-ready component. The agent follows a spec-driven pipeline — it generates planning artifacts before writing any code, so you can review and redirect before implementation begins.
 
 ### How it works
 
@@ -78,7 +78,7 @@ Each folder contains the full set of planning artifacts produced by the agent be
 
 ## Themed products
 
-Aurora is built to power multiple products from a single component library. Every component uses semantic design tokens (`bg-surface`, `text-ink`, `border-accent`, etc.) rather than hardcoded values — swapping a theme changes the entire product's look without touching component code.
+This design system is built to power multiple products from a single component library. Every component uses semantic design tokens (`bg-surface`, `text-ink`, `border-accent`, etc.) rather than hardcoded values — swapping a theme changes the entire product's look without touching component code.
 
 Storybook ships with a theme and brand switcher in the toolbar, so you can preview any component across all supported themes in one place.
 
