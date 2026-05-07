@@ -21,6 +21,7 @@ The skill is designed around two principles: **rich context upfront** and **agen
 
 **1. SpecKit for high-quality specs**
 Before writing a single line of component code, the agent runs two SpecKit commands:
+
 - `speckit.specify` → produces `spec.md` (user scenarios, functional requirements) and `checklists/requirements.md` (completion checklist)
 - `speckit.plan` → produces `plan.md` (technical approach, token mapping) and `data-model.md` (TypeScript props interface, CVA variant shape)
 
@@ -34,6 +35,7 @@ The skill is a slash command (`/figma-quick-component`) — engineers invoke it 
 
 **4. Agentic visual verification**
 Once the component is written, the agent doesn't just run a type-check and stop. It:
+
 1. Starts Storybook in the background
 2. Opens the component's Storybook stories in a browser
 3. Navigates through each variant story, taking a screenshot of each
@@ -71,8 +73,8 @@ Each folder contains the full set of planning artifacts produced by the agent be
 
 **Demo recordings**
 
-- [Search section component](https://1drv.ms/v/c/cc39a0b7dbfc17ac/IQAduYUd8pXuRaKRiCNl_jxHAaoTMy5uxFm5SMWxqGsjFOg?e=kQmZIj) — Full run from Figma URL to verified component. From **5:29**, watch the agent take control of Storybook, switch between variants, take screenshots, and self-correct until every story passes.
-- [Navbar component](https://1drv.ms/v/c/cc39a0b7dbfc17ac/IQBHxGEhTZoRSLHCd8oUCv0LAamFk4kySg4zxpEqBZWyyKs?e=JlGSHp) — Another end-to-end example showing the same pipeline on a more complex component.
+- [Navbar component](https://1drv.ms/v/c/cc39a0b7dbfc17ac/IQAduYUd8pXuRaKRiCNl_jxHAaoTMy5uxFm5SMWxqGsjFOg?e=kQmZIj) — Full run from Figma URL to verified component. From **5:29**, watch the agent take control of Storybook, switch between variants, take screenshots, and self-correct until every story passes.
+- [Search section component](https://1drv.ms/v/c/cc39a0b7dbfc17ac/IQBHxGEhTZoRSLHCd8oUCv0LAamFk4kySg4zxpEqBZWyyKs?e=JlGSHp) — Another end-to-end example showing the same pipeline on a more complex component.
 
 ## Project structure
 
