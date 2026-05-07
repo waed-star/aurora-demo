@@ -1,73 +1,62 @@
-# React + TypeScript + Vite
+# Aurora Design System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React 19 + TypeScript component library built with design tokens, Tailwind CSS v4, and Radix UI primitives. Components are developed and documented in Storybook.
 
-Currently, two official plugins are available:
+## Getting started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev        # Opens Storybook at localhost:6006
+npm test           # Run component tests
+npm run build-storybook  # Build static Storybook site
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Building a component from a Figma design
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Aurora uses Claude Code's `/figma-quick-component` skill to turn a Figma frame into a production-ready component. The agent follows a spec-driven pipeline — it generates planning artifacts before writing any code, so you can review and redirect before implementation begins.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### How to use it
+
+1. Open this repo in [Claude Code](https://claude.ai/code) (desktop app, VS Code extension, or via the StackBlitz + Claude Code integration)
+2. In Figma, right-click any frame or component → **Copy link to selection**
+3. In Claude Code, type:
+   ```
+   /figma-quick-component
+   ```
+4. Paste the Figma node URL when prompted
+5. The agent produces four planning artifacts in `specs/<component-name>/`:
+   - `spec.md` — what the component is and why it exists
+   - `plan.md` — how it will be built (structure, tokens, variants)
+   - `checklists/requirements.md` — completion checklist
+   - `data-model.md` — props interface and variant definitions
+6. Review these files. Once you're happy, the agent implements the component under `src/components/ui/<ComponentName>/`
+
+> **Note:** Implementation is blocked until all four spec files are verified on disk. This is intentional — the spec is the contract.
+
+### Example output
+
+See the `specs/` folder for completed examples:
+
+- [`specs/001-search-section-component/`](specs/001-search-section-component/) — Search section with input and results
+- [`specs/002-navbar-component/`](specs/002-navbar-component/) — Navigation bar component
+
+Each folder contains the full set of planning artifacts produced by the agent before implementation.
+
+## Project structure
+
 ```
+src/
+├── components/ui/     # Shipped components (one folder per component)
+├── styles/tokens.css  # All design tokens
+├── index.css          # Tailwind @theme mappings
+└── lib/utils.ts       # cn() class merging utility
+
+specs/                 # Agent-generated planning artifacts
+.storybook/            # Storybook configuration
+```
+
+## Design token rules
+
+- No hex values or arbitrary Tailwind classes (`bg-[#fff]`) — tokens only
+- All tokens live in `src/styles/tokens.css`
+- Use `cn()` from `src/lib/utils.ts` for all class merging
