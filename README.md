@@ -76,6 +76,12 @@ Each folder contains the full set of planning artifacts produced by the agent be
 - [Navbar component](https://1drv.ms/v/c/cc39a0b7dbfc17ac/IQAduYUd8pXuRaKRiCNl_jxHAaoTMy5uxFm5SMWxqGsjFOg?e=kQmZIj) — Full run from Figma URL to verified component. From **5:29**, watch the agent take control of Storybook, switch between variants, take screenshots, and self-correct until every story passes.
 - [Search section component](https://1drv.ms/v/c/cc39a0b7dbfc17ac/IQBHxGEhTZoRSLHCd8oUCv0LAamFk4kySg4zxpEqBZWyyKs?e=JlGSHp) — Another end-to-end example showing the same pipeline on a more complex component.
 
+## Themed products
+
+Aurora is built to power multiple products from a single component library. Every component uses semantic design tokens (`bg-surface`, `text-ink`, `border-accent`, etc.) rather than hardcoded values — swapping a theme changes the entire product's look without touching component code.
+
+Storybook ships with a theme and brand switcher in the toolbar, so you can preview any component across all supported themes in one place.
+
 ## Project structure
 
 ```
